@@ -12,7 +12,7 @@ import disnake
 from disnake.ext import commands
 
 from monty.bot import Monty
-from monty.constants import Client, Colours, Monitoring
+from monty.constants import Colours, Monitoring
 from monty.errors import APIError, MontyCommandError
 from monty.log import get_logger
 from monty.metadata import ExtMetadata
@@ -190,8 +190,6 @@ class ErrorHandler(
         embed: typing.Optional[disnake.Embed] = None
         should_respond = True
 
-        self.bot.stats.incr("errors")
-
         if isinstance(error, commands.UserInputError):
             embed = await self.handle_user_input_error(ctx, error)
         elif isinstance(error, commands.CheckFailure):
@@ -259,12 +257,7 @@ class ErrorHandler(
                 ).replace("``", "`\u200b`")
                 if len(error_str) > 3000:
                     error_str = error_str[-3000:]
-                msg = (
-                    "Something went wrong internally in the action you were trying to execute. "
-                    "Please report this error and the code below and what you were trying to do in "
-                    f"the [support server](https://discord.gg/{Client.support_server})."
-                    f"\n\n```py\n{error_str}\n```"
-                )
+                msg = f"```py\n{error_str}\n```"
 
                 embed = self.error_embed(title, msg)
 
@@ -294,9 +287,6 @@ class ErrorHandler(
         """Handle all errors with one mega error handler."""
         # add the support button
         components = disnake.ui.MessageActionRow()
-        components.add_button(
-            style=disnake.ButtonStyle.url, label="Support Server", url=f"https://discord.gg/{Client.support_server}"
-        )
         if isinstance(ctx, commands.Context):
             components.insert_item(0, DeleteButton(ctx.author, initial_message=ctx.message))
             if ctx.channel.permissions_for(ctx.me).read_message_history:

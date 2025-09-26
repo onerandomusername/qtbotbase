@@ -33,6 +33,7 @@ from disnake.ext import commands
 
 from monty.log import get_logger
 from monty.metadata import ExtMetadata
+from monty.utils.helpers import cleanup_code
 from monty.utils.messages import DeleteButton
 
 
@@ -92,24 +93,6 @@ class Admin(
         self.bot = bot
         self._last_result = None
         self.sessions = set()
-
-    def cleanup_code(self, content: str) -> str:
-        """Automatically removes code blocks from the code."""
-        if snekbox := self.bot.get_cog("Snekbox"):
-            return snekbox.prepare_input(content)
-        # fall back to legacy if Snekbox cog does not exist
-
-        # remove ```py\n```
-        if content.startswith("```") and content.endswith("```"):
-            content = "\n".join(content.split("\n")[1:-1])
-
-        # remove `foo`
-        content = content.strip("` \n").strip("`")
-
-        # so we can copy paste code, dedent it.
-        content = textwrap.dedent(content)
-
-        return content
 
     async def cog_check(self, ctx: commands.Context) -> bool:
         """Cog-wide check if the user can run these commands."""
@@ -233,7 +216,10 @@ class Admin(
             env["ctx"] = ctx
 
         env.update(globals_to_import)
-        code = self.cleanup_code(code)
+        code = cleanup_code(code)
+        if not code:
+            await ctx.send("No code provided.")
+            return
         log.trace(f"body: {code}")
         stdout = io.StringIO()
         result = None
@@ -351,7 +337,10 @@ class Admin(
                 await ctx.send("Exiting REPL session.")
                 self.sessions.remove(ctx.channel.id)
                 break
-            cleaned = self.cleanup_code(response.content)
+            cleaned = cleanup_code(response.content)
+            if cleaned is None:
+                await ctx.send("No code provided.")
+                continue
             if cleaned in ("quit", "exit", "exit()"):
                 await ctx.send("Exiting.")
                 self.sessions.remove(ctx.channel.id)

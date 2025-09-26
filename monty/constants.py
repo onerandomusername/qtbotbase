@@ -22,7 +22,8 @@ log = cast("CustomLogger", logging.getLogger(__name__))
 
 
 class Client:
-    name = "Monty Python"
+    name = "Qt Core"
+    git_repo = "https://github.com/onerandomusername/qtbotcore"
     token = environ.get("BOT_TOKEN")
     version = environ.get("GIT_SHA", "main")
     default_command_prefix = environ.get("PREFIX", "-")

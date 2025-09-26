@@ -190,15 +190,7 @@ class DeleteButton(disnake.ui.Button):
         # set emoji based on the style
         if emoji is None:
             # use the cat trashcan in disnake and nextcord
-            if isinstance(user, disnake.Member) and user.guild.id in (
-                constants.Guilds.disnake,
-                constants.Guilds.nextcord,
-            ):
-                self.emoji = constants.Emojis.trashcat_special
-            elif self.style == disnake.ButtonStyle.danger:
-                self.emoji = constants.Emojis.trashcan_on_red
-            else:
-                self.emoji = constants.Emojis.trashcan
+            self.emoji = constants.Emojis.trashcat_special
         else:
             self.emoji = emoji
 

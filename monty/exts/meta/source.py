@@ -6,7 +6,6 @@ import reprlib
 import types
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Iterator, Mapping, Optional, Tuple, TypeVar, Union
-from urllib.parse import urldefrag
 
 import disnake
 import rapidfuzz
@@ -15,10 +14,9 @@ import rapidfuzz.process
 from disnake.ext import commands
 
 from monty.bot import Monty
-from monty.constants import Client, Feature, Icons
+from monty.constants import Client, Icons
 from monty.log import get_logger
 from monty.utils.converters import SourceConverter, SourceType
-from monty.utils.helpers import encode_github_link
 from monty.utils.messages import DeleteButton
 
 
@@ -139,9 +137,6 @@ class MetaSource(
             await self.bot.wait_until_first_connect()
             await asyncio.sleep(2)
 
-            # create the feature in the most stupid way possible
-            await self.bot.guild_has_feature(None, Feature.SOURCE_AUTOCOMPLETE)
-
             # these are already proxies
             self.all_cogs = self.bot.cogs
             self.all_extensions = self.bot.extensions
@@ -234,15 +229,6 @@ class MetaSource(
         embed, url = self.build_embed(source_item)
         components = [disnake.ui.Button(url=url, label="Open Github")]
 
-        custom_id = encode_github_link(url)
-        if frag := (urldefrag(url)[1]):
-            frag = frag.replace("#", "").replace("L", "")
-            num1, num2 = frag.split("-")
-            if int(num2) - int(num1) < 30:
-                components.append(
-                    disnake.ui.Button(style=disnake.ButtonStyle.blurple, label="Expand", custom_id=custom_id)
-                )
-
         await send_message(embed, components=components)
 
     @commands.slash_command(name="source")
@@ -267,11 +253,9 @@ class MetaSource(
     async def source_autocomplete(self, inter: disnake.CommandInteraction, query: str) -> dict[str, str]:
         """Implement autocomplete for the meta source command."""
         # shortcircuit if the feature is not enabled
-        new_autocomplete = await self.bot.guild_has_feature(inter.guild_id, Feature.SOURCE_AUTOCOMPLETE)
-        if not new_autocomplete:
-            return {query: query} if query else {}
 
-        await self._cog_ready.wait()
+        if not self._cog_ready.is_set():
+            return {}
         # todo: weight the first results based on usage
         scorer = rapidfuzz.distance.JaroWinkler.similarity  # type: ignore # this is defined
 

@@ -28,7 +28,6 @@ class InternalLogger(commands.Cog):
         if command is None:
             command: commands.Command = ctx.command
         qualname = command.qualified_name
-        self.bot.stats.incr("prefix_commands." + qualname.replace(".", "_") + ".uses")
         logger.info(
             "command %s by %s (%s) in channel %s (%s) in guild %s: %s",
             qualname,
@@ -59,8 +58,6 @@ class InternalLogger(commands.Cog):
             ctx.guild and ctx.guild.id,
         )
 
-        self.bot.stats.incr("prefix_commands." + qualname.replace(".", "_") + ".completion")
-
     @commands.Cog.listener()
     async def on_slash_command(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """Log the start of a slash command."""
@@ -70,11 +67,10 @@ class InternalLogger(commands.Cog):
         if inter.application_command is disnake.utils.MISSING:
             return
         qualname = inter.application_command.qualified_name
-        self.bot.stats.incr("slash_commands." + qualname.replace(".", "_") + ".uses")
 
         logger.info(
             "slash command `%s` by %s (%s) in channel %s (%s) in guild %s: %s",
-            inter.application_command.qualified_name,
+            qualname,
             inter.author,
             inter.author.id,
             inter.channel,
@@ -87,7 +83,6 @@ class InternalLogger(commands.Cog):
     async def on_slash_command_completion(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """Log slash command completion."""
         qualname = inter.application_command.qualified_name
-        self.bot.stats.incr("slash_commands." + qualname.replace(".", "_") + ".completion")
         logger.info(
             "slash command `%s` by %s (%s) in channel %s (%s) in guild %s has completed!",
             qualname,
