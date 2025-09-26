@@ -59,7 +59,7 @@ jobs:
         uses: azure/k8s-deploy@6f7c489cecd8da05646259d9fa3daae92e095c7b # v5.0.4
         with:
           manifests: |
-              monty/deployment.yaml
-          images: 'ghcr.io/onerandomusername/monty-python:${{ steps.sha_tag.outputs.tag }}'
+              qtbotbase/deployment.yaml
+          images: 'ghcr.io/onerandomusername/qtbotbase-python:${{ steps.sha_tag.outputs.tag }}'
           # annotate-namespace: false
           # strategy: 'none'

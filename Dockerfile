@@ -36,4 +36,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ENV PATH="/bot/.venv/bin:$PATH"
 
 
-ENTRYPOINT ["python3", "-m", "monty"]
+ENTRYPOINT ["python3", "-m", "qtbotbase"]

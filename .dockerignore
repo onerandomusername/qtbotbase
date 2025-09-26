@@ -3,7 +3,7 @@
 
 # Make exceptions for what's needed
 !alembic.ini
-!monty/
+!qtbotbase/
 !pyproject.toml
 !uv.lock
 !LICENSE

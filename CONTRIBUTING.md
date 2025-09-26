@@ -1,21 +1,21 @@
 ---
-description: Contributing your changes to Monty Python
+description: Contributing your changes to qtbotbase
 ---
 
 # Contributing
 
-Thank you for your interest in contributing to Monty!
+Thank you for your interest in contributing to qtbotbase!
 
 This document explains the contributing process in full. If your question isn't
 answered here, please
-[open an issue](https://github.com/onerandomusername/monty-python/issues)
+[open an issue](https://github.com/onerandomusername/qtbotbase/issues)
 
 ## Issue Tracker
 
 ### Reporting a bug
 
 If you find a bug, please report it to
-[the issue tracker](https://github.com/onerandomusername/monty-python/issues/new/choose)
+[the issue tracker](https://github.com/onerandomusername/qtbotbase/issues/new/choose)
 with the details of what command you ran, whether or not the bot is in the
 server or if you have the bot installed to your user, and the guild ID. This
 will help us find the bug so we can fix it.
@@ -23,7 +23,7 @@ will help us find the bug so we can fix it.
 ### Requesting a new feature
 
 If you're looking to submit a new feature, please create an issue on
-[the issue tracker](https://github.com/onerandomusername/monty-python/issues/new/choose)
+[the issue tracker](https://github.com/onerandomusername/qtbotbase/issues/new/choose)
 first, so the details can be discussed before submitting. If you have an idea
 for a new feature, but don't want to implement it yourself, PLEASE also create
 an issue! We love suggestions and new ideas, and want to ensure we're adding
@@ -41,12 +41,12 @@ The general workflow can be summarized as follows:
 1. Create a new branch.
 1. Commit your changes, update documentation if required.
 1. Push the branch to your fork, and
-    [submit a pull request!](https://github.com/onerandomusername/monty-python/pull/new)
+    [submit a pull request!](https://github.com/onerandomusername/qtbotbase/pull/new)
 
 ### But wait!
 
 Before contributing, **please**
-[make an issue](https://github.com/onerandomusername/monty-python/issues/new/choose)
+[make an issue](https://github.com/onerandomusername/qtbotbase/issues/new/choose)
 for the specific fix or feature you are attempting to work on: we don't want you
 to work on a feature that someone else is already working on, so please check
 before you do! Small fixes, such as typos or logic bugs can be fixed without an
@@ -64,22 +64,15 @@ developer at any time.
 - python 3.10
 - uv
 
-Additionally, a postgresql database is required to develop Monty, but this is
-included in the developer
-[docker-compose.yaml](https://github.com/onerandomusername/monty-python/blob/main/docker-compose.yaml)
-file.
-
-If running the bot within docker, most of the following steps can be skipped as
-the environment is built within docker automatically. You'll still need to clone
-the repository and set up pre-commit hooks.
+Additionally, an SQL database is required to develop qtbotbase, but this supports sqlite and installs the necessary drivers automatically. Sure, you can use PostgreSQL, but why would you want to?
 
 ### Clone the repo
 
 First step to getting started is to clone the repository:
 
 ```sh
-git clone https://github.com/onerandomusername/monty-python
-cd monty-python
+git clone https://github.com/onerandomusername/qtbotbase
+cd qtbotbase
 ```
 
 Next, create a file named `.env` within the cloned repository. This will be used
@@ -127,48 +120,14 @@ Follow the steps through and save the developer token. It needs to go in the
 You'll also need to connect this bot to at least one server you have access to.
 
 > [!WARNING]
-> Monty Python requires the message content intent and **won't start** if that
+> qtbotbase requires the message content intent and **won't start** if that
 > intent is disabled. Be sure to enable it when configuring the bot.
 
-# Running Monty
-
-From this point, I suggest running two separate docker compose commands. The
-first one to run is `docker compose up --detach postgres redis` which starts the
-necessary dependent services. If contributing to the eval command, or global
-source, then snekbox is also required. The detach flag starts these services but
-does not watch them.
-
-### Running outside of Docker
-
-For debugging, I personally run Monty outside of docker, but run the dependent
-services within docker. For this to be done, the following configuration is
-required in the .env file:
+### Running the bot
 
 ```sh
 # within .env
 BOT_TOKEN=... # token from earlier
-# REQUIRED
-DB_BIND='postgresql+asyncpg://monty:monty@localhost:5432/monty'
 # to run database migrations/set up the bot for the first time
 DB_RUN_MIGRATIONS=true
-
-# optional, for -eval and global source development
-SNEKBOX_URL='http://localhost:8060/'
-
-# the redis connection bind if docker compose is running redis
-REDIS_URI='redis://default@localhost:6379'
-# optional: to only require postgres
-USE_FAKEREDIS=true
 ```
-
-### Running in Docker
-
-If the other services in Docker are already running, simply running the
-following should start the bot.
-
-```sh
-docker compose up monty
-```
-
-Monty should now be running! There's now a few other configuration things to do
-to finish initialising the database. See the bot only commands.

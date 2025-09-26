@@ -51,11 +51,11 @@ jobs:
         run: |
           tag=$(cut -c 1-7 <<< $GITHUB_SHA)
           echo "tag=$tag" >> $GITHUB_OUTPUT
-      # Check out the current repository in the `monty` subdirectory
+      # Check out the current repository in the `qtbotbase` subdirectory
       - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          path: monty
+          path: qtbotbase
           persist-credentials: false
 
       - name: Set up Docker Buildx
@@ -74,14 +74,14 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
-          context: monty/
-          file: monty/Dockerfile
+          context: qtbotbase/
+          file: qtbotbase/Dockerfile
           push: true
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/monty-python:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/qtbotbase-python:latest
           cache-to: type=inline
           tags: |
-            ghcr.io/${{ github.repository_owner }}/monty-python:latest
-            ghcr.io/${{ github.repository_owner }}/monty-python:${{ steps.sha_tag.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/qtbotbase-python:latest
+            ghcr.io/${{ github.repository_owner }}/qtbotbase-python:${{ steps.sha_tag.outputs.tag }}
           build-args: |
             git_sha=${{ github.sha }}
 

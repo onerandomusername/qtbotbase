@@ -1,15 +1,7 @@
-# Monty Python
+# qtbotbase
 
 _A Python and GitHub focused Discord bot to make collaborating on Python
 projects through Discord easier than ever._
-
-## How to use Monty
-
-Public instance of Monty Python is invitable here:
-<https://discord.com/oauth2/authorize?client_id=872576125384147005>
-
-You can also add Monty Python to your user account and use slash commands
-anywhere on Discord.
 
 ## Contributing
 

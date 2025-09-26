@@ -27,8 +27,8 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: monty-python
+          SENTRY_PROJECT: qtbotbase-python
         with:
           tagName: ${{ github.sha }}
           environment: production
-          releaseNamePrefix: monty@
+          releaseNamePrefix: qtbotbase@
