@@ -1,4 +1,3 @@
-import dataclasses
 import logging
 from os import environ
 from typing import TYPE_CHECKING, Literal, cast
@@ -7,25 +6,19 @@ import disnake
 
 
 if TYPE_CHECKING:
-    from monty.log import MontyLogger
+    from monty.log import CustomLogger
 
 __all__ = (
     "Client",
     "Monitoring",
     "Database",
-    "Redis",
-    "CodeBlock",
     "Colours",
     "Emojis",
     "Icons",
-    "Auth",
-    "Endpoints",
-    "Feature",
-    "Guilds",
 )
 
 # due to recursive imports, we have to use this
-log = cast("MontyLogger", logging.getLogger(__name__))
+log = cast("CustomLogger", logging.getLogger(__name__))
 
 
 class Client:
@@ -33,7 +26,6 @@ class Client:
     token = environ.get("BOT_TOKEN")
     version = environ.get("GIT_SHA", "main")
     default_command_prefix = environ.get("PREFIX", "-")
-    config_prefix = "monty-python"
 
     # debug configuration
     debug = environ.get("BOT_DEBUG", "true").lower() == "true"
@@ -42,9 +34,6 @@ class Client:
         ext.strip() for ext in environ.get("BOT_EXTENSIONS").split(",")  # type: ignore reportOptionalMemberAccess
     }
 
-    # source and support
-    git_repo = "https://github.com/onerandomusername/monty-python"
-    support_server = "mPscM4FjWB"
     # note that these are the default invite permissions,
     # But Monty fetches the ones configured in the developer portal and replace these
     default_invite_permissions = disnake.Permissions(
@@ -67,45 +56,15 @@ class Client:
 
 
 class Database:
-    postgres_bind: str = environ.get("DB_BIND", "")
+    postgres_bind: str = environ.get("DB_BIND", "sqlite+aiosqlite:///./qtcore.db")
     run_migrations: bool = not (environ.get("DB_RUN_MIGRATIONS", "true").lower() == "false")
     migration_target: str = environ.get("DB_MIGRATION_TARGET", "head")
 
 
-class Redis:
-    uri = environ.get("REDIS_URI", "redis://redis:6379")
-    use_fakeredis = environ.get("USE_FAKEREDIS", "false").lower() == "true"
-    prefix = Client.config_prefix + ":"
-
-
 class Monitoring:
     debug_logging = environ.get("LOG_DEBUG", "true").lower() == "true"
-    sentry_enabled = bool(environ.get("SENTRY_DSN"))
     trace_loggers = environ.get("BOT_TRACE_LOGGERS")
     log_mode: Literal["daily", "dev"] = "daily" if "daily" == environ.get("BOT_LOG_MODE", "dev").lower() else "dev"
-
-    public_status_page: str | None = environ.get("UPTIME_STATUS_PAGE") or None
-    ping_url: str = environ.get("UPTIME_URL", "")
-    ping_interval: int = int(environ.get("UPTIME_INTERVAL", 60))  # in seconds
-    ping_enabled: bool = bool(ping_url)
-    ping_query_params = {
-        "status": "up",
-        "msg": "OK",
-        "ping": lambda bot: f"{bot.latency * 1000:.2f}",
-    }
-
-
-class Stats:
-    host = environ.get("STATS_HOST", "localhost")
-    port = int(environ.get("STATS_PORT", 8125))
-    prefix = Client.config_prefix
-
-
-# DEPRECATED: to be moved to a postgres value
-# note: enablement of Codeblock actions is controlled via the Feature.CODEBLOCK_RECOMMENDATIONS
-class CodeBlock:
-    cooldown_seconds: int = 300
-    minimum_lines: int = 4
 
 
 # TODO: every colour across the bot should use colours from this palette
@@ -196,47 +155,3 @@ class Icons:
 
 
 ## Authentication and Endpoint management for external services
-
-
-class Auth:
-    github = environ.get("GITHUB_TOKEN")
-    snekbox = environ.get("SNEKBOX_AUTH")
-
-
-class Endpoints:
-    app_info = environ.get("APPLICATION_INFO_ENDPOINT")
-    pypi_simple = "https://pypi.org/simple/"
-    top_pypi_packages = environ.get("PYPI_TOP_PACKAGES", "")
-
-    snekbox = environ.get("SNEKBOX_URL", "")
-
-    black_formatter = environ.get("BLACK_API")
-    black_playground = environ.get("BLACK_PLAYGROUND", "https://black.vercel.app/")
-
-    paste_service = environ.get("PASTE_SERVICE", "")
-    raw_paste: str = environ.get("PASTE_SERVICE_RAW", "")
-
-
-## Feature Management
-@dataclasses.dataclass()
-class Feature:
-    CODEBLOCK_RECOMMENDATIONS: str = "PYTHON_CODEBLOCK_RECOMMENDATIONS"
-    DISCORD_TOKEN_REMOVER: str = "DISCORD_BOT_TOKEN_FILTER"  # noqa: S105
-    DISCORD_WEBHOOK_REMOVER: str = "DISCORD_WEBHOOK_FILTER"
-    GITHUB_COMMENT_LINKS: str = "GITHUB_EXPAND_COMMENT_LINKS"
-    GITHUB_DISCUSSIONS: str = "GITHUB_AUTOLINK_DISCUSSIONS"
-    GITHUB_ISSUE_EXPAND: str = "GITHUB_AUTOLINK_ISSUE_SHOW_DESCRIPTION"
-    GITHUB_ISSUE_LINKS: str = "GITHUB_EXPAND_ISSUE_LINKS"
-    GLOBAL_SOURCE: str = "GLOBAL_SOURCE_COMMAND"
-    INLINE_DOCS: str = "INLINE_DOCUMENTATION"
-    INLINE_EVALULATION: str = "INLINE_EVALULATION"
-    PYPI_AUTOCOMPLETE: str = "PYPI_PACKAGE_AUTOCOMPLETE"
-    PYTHON_DISCOURSE_AUTOLINK: str = "PYTHON_DISCOURSE_AUTOLINK"
-    RUFF_RULE_V2: str = "RUFF_RULE_V2"
-    SOURCE_AUTOCOMPLETE: str = "META_SOURCE_COMMAND_AUTOCOMPLETE"
-
-
-# legacy implementation of features, will be removed in the future
-class Guilds:
-    disnake = 808030843078836254
-    nextcord = 881118111967883295

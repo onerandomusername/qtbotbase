@@ -22,9 +22,9 @@ except ImportError:
 TRACE = 5
 
 
-def get_logger(name: str) -> "MontyLogger":
+def get_logger(name: str) -> "CustomLogger":
     """Stub method for logging.getLogger."""
-    return cast("MontyLogger", logging.getLogger(name))
+    return cast("CustomLogger", logging.getLogger(name))
 
 
 class LoggingParams(TypedDict, total=False):
@@ -36,7 +36,7 @@ class LoggingParams(TypedDict, total=False):
     extra: Mapping[str, object] | None
 
 
-class MontyLogger(logging.Logger):
+class CustomLogger(logging.Logger):
     """Custom logger which implements the trace level."""
 
     def trace(self, msg: object, *args: object, **kwargs: Unpack[LoggingParams]) -> None:
@@ -55,7 +55,7 @@ def setup() -> None:
     # Configure the "TRACE" logging level (e.g. "log.trace(message)")
     logging.TRACE = TRACE  # type: ignore
     logging.addLevelName(TRACE, "TRACE")
-    logging.setLoggerClass(MontyLogger)
+    logging.setLoggerClass(CustomLogger)
 
     format_string = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
     log_format = logging.Formatter(format_string)
